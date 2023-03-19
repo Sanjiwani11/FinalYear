@@ -34,11 +34,12 @@ const PORT = process .env.PORT || 5000
 const server = app.listen(PORT, console.log(`Server Started on PORT ${PORT}`.yellow.bold));
 
 const io = require('socket.io')(server, {
+  pingTimeout: 60000,
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
     credentials: true
-  }
+  } 
 });
 //const io = require('socket.io').listen(server);
 
@@ -51,20 +52,9 @@ io.on("connection", (socket) => {
     socket.emit('connected');
   });
 
-    socket.on("join chat", (room) => {
-      socket.join(room);
-      console.log("User joined Room: " + room);
-    });
-  
-  socket.on('new message', (newMessageReceived) => {
-    var chat = newMessageReceived.chat;
-    if (!chat.users) return console.log('chat.users not defined');
-    
-    chat.users.forEach(users => {
-      if (user._id == newMessageReceived.sender._id) return;
-
-      socket.in(user._id).emit("message received", newMessageReceived);
-    });
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User joined Room: " + room);
   });
 
   socket.on('typing', (room) => socket.in(room).emit("typing"));
@@ -73,6 +63,17 @@ io.on("connection", (socket) => {
   socket.off("setup", () => {
     console.log("user disconnected");
     socket.leave(userData._id);
+  });
+  
+  socket.on('new message', (newMessageReceived) => {
+    var chat = newMessageReceived.chat;
+    if (!chat.users) return console.log('chat.users not defined');
+    
+    chat.users.forEach((user) => {
+      if (user._id == newMessageReceived.sender._id) return;
+
+      socket.in(user._id).emit("message received", newMessageReceived);
+    });
   });
 });
 

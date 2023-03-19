@@ -10,8 +10,6 @@ import './styles.css';
 import ScrollableChat from './ScrollableChat';
 import io from 'socket.io-client';
 
-
-//const ENDPOINT = "http://localhost:6000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -183,6 +181,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             </div>    
                         )}
                         <FormControl onKeyDown={sendMessage} isRequired mt="3">
+                            {isTyping? <div>Loading...</div>:<></>}
                             <Input variant="filled"
                                 bg="#E0E0E0"
                                 placeholder="Enter a message.."
